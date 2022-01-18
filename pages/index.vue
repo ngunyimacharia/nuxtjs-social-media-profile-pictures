@@ -12,7 +12,7 @@
 
     <div class="py-6 w-2/3 mx-auto">
         <div class="bg-white overflow-hidden sm:rounded-lg sm:shadow p-5">
-          <form class="space-y-8" @submit.prevent="form.submitted='true'" @reset.prevent="reset">
+          <form class="space-y-8" @submit.prevent="submit" @reset.prevent="reset">
             <div class="space-y-8 sm:space-y-5">
               <div>
 
@@ -22,7 +22,7 @@
                       Social network
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
-                      <select required v-model="form.network" id="network" name="network" autocomplete="network" class="max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                      <select @change="unsubmit" required v-model="form.network" id="network" name="network" autocomplete="network" class="max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
                         <option v-for="network in networks" :key="network.value" :value="network">{{network.name}}</option>
                       </select>
                     </div>
@@ -33,7 +33,7 @@
                         {{ form.network.name }}
                       </label>
                       <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input required v-model="form.identifier" :type="form.network.type" name="identifier" id="identifier" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md" />
+                        <input @keypress="unsubmit" required v-model="form.identifier" :type="form.network.type" name="identifier" id="identifier" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md" />
                         <p class="text-red-800 text-sm my-5">
                           {{form.network.hint}}
                         </p>
@@ -124,6 +124,12 @@ export default {
     this.form.network = this.networks[0];
   },
   methods:{
+    unsubmit(){
+      this.form.submitted='false';
+    },
+    submit(){
+      this.form.submitted='true';
+    },
     showSample(sample){
       this.form.submitted = 'false';
       this.form.network = this.networks[sample.network];
