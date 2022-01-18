@@ -13,7 +13,7 @@
     <div class="py-6 grid grid-cols-2">
       <div>
         <div class="bg-white overflow-hidden sm:rounded-lg sm:shadow p-5">
-          <form class="space-y-8" @submit.prevent="submit">
+          <form class="space-y-8" @submit.prevent="submitted=true">
             <div class="space-y-8 sm:space-y-5">
               <div>
 
@@ -58,7 +58,8 @@
       </div>
 
       <div>
-        image
+        <cld-image v-if="submitted" :public-id="`${form.identifier}.jpg`" :type="form.network">
+        </cld-image>
       </div>
     </div>
 
@@ -79,13 +80,7 @@ export default {
         {name:'Twitter', value:'twitter'},
         {name:'Gravatar', value:'gravatar'},
       ],
-      image:null
-    }
-  },
-  methods:{
-    submit(){
-      this.image = `https://res.cloudinary.com/demo/image/${this.form.network}/${this.form.identifier}.jpg`;
-      console.log(this.image);
+      submitted:false
     }
   }
 }
