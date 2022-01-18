@@ -39,7 +39,6 @@
                         </p>
                       </div>
                   </div>
-                  <input v-model="form.submitted" name="submiited" id="submitted" class="hidden" />
                 </div>
               </div>
             </div>
