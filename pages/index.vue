@@ -131,7 +131,7 @@ export default {
     },
     submit(){
       if(this.form.network.value === 'gravatar'){
-        this.form.identifier = md5('info@cloudinary.com');
+        this.form.identifier = md5(this.form.identifier);
       }
       this.form.submitted='true';
     },
