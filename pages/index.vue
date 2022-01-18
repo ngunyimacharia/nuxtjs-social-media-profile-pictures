@@ -77,6 +77,9 @@
 </template>
 
 <script>
+
+import md5 from "crypto-js/md5";
+
 export default {
   name: 'IndexPage',
   data(){
@@ -108,7 +111,7 @@ export default {
         {
           name:'Gravatar Email Address (Alphanumeric)', 
           value:'gravatar',
-          type:'email',
+          type:'text',
           hint: 'The email address of the Gravatar user account'
         },
       ],
@@ -116,7 +119,7 @@ export default {
         { text:'Bill Clinton (Facebook)', network: 0, identifier: '65646572251'},
         { text:'Bill Clinton (Twitter ID)', network: 1, identifier: '1330457336'},
         { text:'Bill Clinton (Twitter Username)', network: 2, identifier: 'BillClinton'},
-        { text:'Cloudinary (Gravatar)', network: 3, identifier: 'info@cloudinary.com'},
+        { text:'Cloudinary (Gravatar)', network: 3, identifier: "info@cloudinary.com"},
       ]
     }
   },
@@ -128,13 +131,16 @@ export default {
       this.form.submitted='false';
     },
     submit(){
+      if(this.form.network.value === 'gravatar'){
+        this.form.identifier = md5('info@cloudinary.com');
+      }
       this.form.submitted='true';
     },
     showSample(sample){
-      this.form.submitted = 'false';
+      this.unsubmit();
       this.form.network = this.networks[sample.network];
       this.form.identifier = sample.identifier;
-      this.form.submitted = 'true';
+      this.submit();
     },
     reset(){
       this.form = {
