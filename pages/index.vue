@@ -5,15 +5,14 @@
           <h3 class="text-lg leading-6 font-medium text-gray-900">
             Social media picture
           </h3>
-          <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          <p class="mt-1 mx-auto text-sm text-gray-500">
             Fetch profile pictures from either FaceBook, Twitter or Gravatar
           </p>
         </div>
 
-    <div class="py-6 grid grid-cols-2">
-      <div>
+    <div class="py-6 w-2/3 mx-auto">
         <div class="bg-white overflow-hidden sm:rounded-lg sm:shadow p-5">
-          <form class="space-y-8" @submit.prevent="submitted=true">
+          <form class="space-y-8" @submit.prevent="form.submitted='true'" @reset.prevent="reset">
             <div class="space-y-8 sm:space-y-5">
               <div>
 
@@ -24,21 +23,23 @@
                     </label>
                     <div class="mt-1 sm:mt-0 sm:col-span-2">
                       <select required v-model="form.network" id="network" name="network" autocomplete="network" class="max-w-lg block focus:ring-indigo-500 focus:border-indigo-500 w-full shadow-sm sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
-                        <option value="facebook">Facebook</option>
-                        <option value="twitter">Twitter</option>
-                        <option value="gravatar">Gravatar</option>
+                        <option v-for="network in networks" :key="network.value" :value="network">{{network.name}}</option>
                       </select>
                     </div>
                   </div>
 
-                  <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+                  <div v-if="form.network" class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
                       <label for="identifier" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Identifier (username)
+                        {{ form.network.name }}
                       </label>
                       <div class="mt-1 sm:mt-0 sm:col-span-2">
-                        <input required v-model="form.identifier" type="text" name="identifier" id="identifier" autocomplete="given-name" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                        <input required v-model="form.identifier" :type="form.network.type" name="identifier" id="identifier" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md" />
+                        <p class="text-red-800 text-sm my-5">
+                          {{form.network.hint}}
+                        </p>
                       </div>
                   </div>
+                  <input v-model="form.submitted" name="submiited" id="submitted" class="hidden" />
                 </div>
               </div>
             </div>
@@ -55,14 +56,23 @@
             </div>
           </form>
         </div>
-      </div>
-
-      <div>
-        <cld-image v-if="submitted" :public-id="`${form.identifier}.jpg`" :type="form.network">
-        </cld-image>
-      </div>
     </div>
 
+    <div class="text-center">
+      <button 
+        v-for="sample in samples"
+        :key="sample.network"
+        @click="showSample(sample)"
+        class="m-2 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        {{sample.text}}
+      </button>
+    </div>
+
+      <div class="text-center">
+        <cld-image class="mx-auto w-96" v-if="form.submitted == 'true'" :public-id="`${form.identifier}.jpg`" :type="form.network.value" :alt="`${form.network.value} - ${form.identifier}`">
+        </cld-image>
+      </div>
 </div>
 </template>
 
@@ -72,15 +82,61 @@ export default {
   data(){
     return {
       form:{
-        network:'facebook',
-        identifier:''
+        network:null,
+        identifier:'',
+        submitted:false
       },
       networks:[
-        {name:'Facebook', value:'facebook'},
-        {name:'Twitter', value:'twitter'},
-        {name:'Gravatar', value:'gravatar'},
+        {
+          name:'Facebook ID (Numeric)', 
+          value:'facebook',
+          type:'number',
+          hint:'For privacy protection reasons, Facebook no longer supports accessing user images based on the user name; only the application-specific numeric ID obtained through authentication.'
+        },
+        {
+          name:'Twitter ID (Numeric)', 
+          value:'twitter',
+          type:'number',
+          hint:'The Twitter user ID is the unique numeric obtained once the user has authenticated into your application'
+        },
+        {
+          name:'Twitter Username (Alphanumeric)', 
+          value:'twitter_name',
+          type:'text',
+          hint:'The Twitter username is the alphanumeric unique screen name for each twitter user account.'
+        },
+        {
+          name:'Gravatar Email Address (Alphanumeric)', 
+          value:'gravatar',
+          type:'email',
+          hint: 'The email address of the Gravatar user account'
+        },
       ],
-      submitted:false
+      samples:[
+        { text:'Bill Clinton (Facebook)', network: 0, identifier: '65646572251'},
+        { text:'Bill Clinton (Twitter ID)', network: 1, identifier: '1330457336'},
+        { text:'Bill Clinton (Twitter Username)', network: 2, identifier: 'BillClinton'},
+        { text:'Cloudinary (Gravatar)', network: 3, identifier: 'info@cloudinary.com'},
+      ]
+    }
+  },
+  mounted(){
+    this.form.network = this.networks[0];
+  },
+  methods:{
+    showSample(sample){
+      this.form.submitted = 'false';
+      this.form.network = this.networks[sample.network];
+      this.form.identifier = sample.identifier;
+      this.form.submitted = 'true';
+    },
+    reset(){
+      this.form = {
+        network:null,
+        identifier:'',
+        submitted:false
+      };
+      this.form.network = this.networks[0];
     }
   }
 }
